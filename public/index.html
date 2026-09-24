@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barrios de Buenos Aires</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        lav: {
+                            50: '#f7f5fd', 100: '#efecfb', 200: '#e3dff8', 300: '#cdc5f0',
+                            400: '#bbadeb', 500: '#a49bdf', 600: '#8986cd', 700: '#7370b8',
+                            800: '#5f5ca6'
+                        },
+                        gold: { DEFAULT: '#fcbf45', dark: '#e5a92e', soft: '#f5d98a' },
+                        ink: '#241f3d',
+                        canvas: '#f6f4fc'
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer components {
+            .btn {
+                @apply inline-flex items-center justify-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold transition-all cursor-pointer;
+                @apply hover:outline hover:outline-2 hover:outline-offset-2 hover:outline-ink;
+                @apply focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink;
+            }
+            .btn-primary { @apply bg-lav-600 text-white hover:bg-lav-700; }
+            .btn-gold { @apply bg-gold text-ink hover:bg-gold-dark; }
+            .btn-ghost { @apply bg-transparent text-lav-700 border border-lav-300 hover:bg-lav-100; }
+            .btn-danger { @apply bg-red-500 text-white hover:bg-red-600; }
+            .card {
+                @apply bg-white rounded-2xl border border-lav-200 overflow-hidden flex flex-col;
+                @apply hover:outline hover:outline-2 hover:outline-offset-2 hover:outline-lav-600;
+            }
+            .card-gold { @apply hover:outline-gold; }
+            .panel { @apply bg-white rounded-2xl border border-lav-200 p-6; }
+            .nav-link {
+                @apply block px-3 py-1.5 rounded-full text-sm font-medium text-white/90 transition-colors;
+                @apply hover:bg-white/10 hover:outline hover:outline-1 hover:outline-offset-1 hover:outline-white/60;
+            }
+            .nav-link.active { @apply bg-gold text-ink hover:bg-gold-dark hover:outline-transparent; }
+            .badge { @apply inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-semibold leading-5; }
+            .badge-on-media { @apply outline outline-1 outline-offset-1 outline-white/80; }
+            .badge-comuna { @apply bg-gold text-ink; }
+            .badge-colectivo { @apply bg-gold text-ink; }
+            .badge-tren { @apply bg-lav-600 text-white; }
+            .badge-subte { @apply bg-lav-400 text-ink; }
+            .badge-neutral { @apply bg-lav-100 text-lav-700; }
+            .stat-box { @apply bg-lav-50 border border-lav-200 rounded-xl px-4 py-3; }
+            .stat-label { @apply block text-[11px] font-semibold text-lav-700 uppercase tracking-wide mb-0.5; }
+            .stat-value { @apply block font-bold text-ink text-lg; }
+            .field { @apply w-full border border-lav-300 rounded-xl px-3 py-2 text-sm bg-white text-ink placeholder:text-lav-500 focus:outline-none focus:ring-2 focus:ring-lav-600 focus:border-lav-600; }
+            .label { @apply block text-xs font-semibold text-lav-700 uppercase tracking-wide mb-1; }
+            .section-title { @apply text-lg font-bold text-ink mb-3; }
+            .link { @apply text-ink font-semibold underline decoration-lav-400 hover:text-lav-800; }
+            .empty-state { @apply text-center text-ink font-semibold py-10; }
+        }
+    </style>
+    <style>
+        body {
+            --s: 16px;
+            --c1: #e1e1f3;
+            --c2: #efecfa;
+            --g: #0000 66%, var(--c1) 67% 98%, #0000;
+            background:
+                radial-gradient(30% 50% at 30% 100%, var(--g)),
+                radial-gradient(30% 50% at 70% 0%, var(--g)) var(--s) 0,
+                repeating-linear-gradient(90deg, var(--c1) 0 10%, var(--c2) 0 50%);
+            background-size: calc(10 * var(--s)) calc(6 * var(--s));
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <nav class="relative bg-gradient-to-r from-lav-600 to-lav-400 text-white border-b-2 border-gold">
+        <div class="container mx-auto px-4 py-3 flex flex-wrap justify-between items-center gap-2">
+            <a href="/" class="flex items-center gap-2 text-xl font-extrabold tracking-tight">
+                <span class="inline-block w-2.5 h-2.5 rounded-full bg-gold"></span>Barriopoli
+            </a>
+            <input type="checkbox" id="toggle-nav" class="peer sr-only" />
+            <label for="toggle-nav" class="md:hidden p-2 rounded-lg hover:bg-white/10 hover:outline hover:outline-1 hover:outline-white/60 cursor-pointer select-none" aria-label="Abrir menu">
+                <span class="block w-5 h-0.5 bg-white mb-1"></span>
+                <span class="block w-5 h-0.5 bg-white mb-1"></span>
+                <span class="block w-5 h-0.5 bg-white"></span>
+            </label>
+            <div class="hidden w-full flex-col gap-1 p-2 order-last peer-checked:flex md:order-none md:flex md:w-auto md:flex-row md:items-center md:gap-1 md:p-0">
+                <a href="/barrios" class="nav-link">Todos</a>
+                <a href="/barrios/desactivados" class="nav-link">Desactivados</a>
+                <a href="/clientes" class="nav-link">Clientes</a>
+                <a href="/barrios/nuevo" class="nav-link">Nuevo</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container mx-auto p-6">
+        <h1 class="text-3xl font-extrabold text-ink tracking-tight border-l-4 border-gold pl-3 mb-6">Barrios de Buenos Aires</h1>
+        <p class="text-ink font-medium mb-6">Selecciona una comuna en el mapa para ver sus barrios:</p>
+        <div class="panel">
+            <p id="mapa-loading" class="text-center text-lav-600 py-24">Cargando mapa…</p>
+            <svg id="mapa-caba" class="hidden" role="img" aria-label="Mapa de comunas de CABA"></svg>
+        </div>
+        <noscript>
+            <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 mt-6">
+                <a href="/barrios/comuna/1" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 1</a>
+                <a href="/barrios/comuna/2" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 2</a>
+                <a href="/barrios/comuna/3" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 3</a>
+                <a href="/barrios/comuna/4" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 4</a>
+                <a href="/barrios/comuna/5" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 5</a>
+                <a href="/barrios/comuna/6" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 6</a>
+                <a href="/barrios/comuna/7" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 7</a>
+                <a href="/barrios/comuna/8" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 8</a>
+                <a href="/barrios/comuna/9" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 9</a>
+                <a href="/barrios/comuna/10" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 10</a>
+                <a href="/barrios/comuna/11" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 11</a>
+                <a href="/barrios/comuna/12" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 12</a>
+                <a href="/barrios/comuna/13" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 13</a>
+                <a href="/barrios/comuna/14" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 14</a>
+                <a href="/barrios/comuna/15" class="card card-gold block p-4 text-center font-semibold text-ink">Comuna 15</a>
+            </div>
+        </noscript>
+        <div class="mt-8 text-center">
+            <a href="/barrios" class="btn btn-primary">Ver todos los barrios</a>
+        </div>
+    </div>
+    <script src="/js/mapa.js" defer></script>
+</body>
+</html>
