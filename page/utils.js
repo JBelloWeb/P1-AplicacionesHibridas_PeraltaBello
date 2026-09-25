@@ -4,6 +4,7 @@ export function createPage(title, content, active = "") {
     let html = ""
     html += '<!DOCTYPE html><html lang="es"><head><meta charset="UTF-8">'
     html += '<meta name="viewport" content="width=device-width, initial-scale=1.0">'
+    html += '<link rel="icon" type="image/svg+xml" href="/favicon.svg">'
     html += `<title>${title}</title>`
     html += TAILWIND_CONFIG
     html += COMPONENT_CSS
