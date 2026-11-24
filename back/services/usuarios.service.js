@@ -1,6 +1,7 @@
 import bcrypt from "bcrypt"
 import jwt from "jsonwebtoken"
 import { db } from "./db.js"
+import { HttpError } from "./errors.js"
 
 const usuarios = db.collection("usuarios")
 const SIN_PASSWORD = { projection: { password: 0 } }
@@ -10,13 +11,6 @@ usuarios.createIndex({ email: 1 }, { unique: true }).catch((error) =>
     console.error("No se pudo crear el índice de usuarios:", error.message)
 )
 
-export class AuthError extends Error {
-    constructor(status, message) {
-        super(message)
-        this.status = status
-    }
-}
-
 function sinPassword({ password, ...usuario }) {
     return usuario
 }
@@ -24,7 +18,7 @@ function sinPassword({ password, ...usuario }) {
 // El rol nunca viene del cliente: todo registro público es "user".
 export async function registrar({ nombre, email, password }, rol = "user") {
     const existe = await usuarios.findOne({ email })
-    if (existe) throw new AuthError(409, "Ya existe una cuenta con ese email")
+    if (existe) throw new HttpError(409, "Ya existe una cuenta con ese email")
 
     const usuario = {
         nombre,
@@ -40,7 +34,7 @@ export async function registrar({ nombre, email, password }, rol = "user") {
 export async function login({ email, password }) {
     const usuario = await usuarios.findOne({ email })
     const valido = usuario && (await bcrypt.compare(password, usuario.password))
-    if (!valido) throw new AuthError(401, "Email o contraseña incorrectos")
+    if (!valido) throw new HttpError(401, "Email o contraseña incorrectos")
 
     const datos = {
         _id: usuario._id.toString(),

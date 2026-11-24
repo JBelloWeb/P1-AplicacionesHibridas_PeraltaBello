@@ -1,35 +1,83 @@
 import * as clienteService from "../../services/clientes.service.js"
+import { responderError } from "./responder.js"
 
 export async function getClientes(req, res) {
     try {
         const clientes = await clienteService.getClientes()
         res.status(200).json(clientes)
     } catch (error) {
-        res.status(500).json({ message: error.message })
+        responderError(res, error)
+    }
+}
+
+export async function getClienteById(req, res) {
+    try {
+        const cliente = await clienteService.getClienteById(req.params.id)
+        res.status(200).json(cliente)
+    } catch (error) {
+        responderError(res, error)
     }
 }
 
 export async function saveCliente(req, res) {
     try {
-        const body = req.body || {}
-        const data = {}
-        if (typeof body.nombre === "string" && body.nombre.trim()) data.nombre = body.nombre.trim()
-        if (typeof body.foto === "string") data.foto = body.foto
-        if (typeof body.descripcion === "string") data.descripcion = body.descripcion
-        if (!data.nombre) return res.status(400).json({ message: "El campo nombre es requerido" })
-        const cliente = await clienteService.saveCliente(data)
+        const cliente = await clienteService.saveCliente(req.body)
         res.status(201).json(cliente)
     } catch (error) {
-        res.status(500).json({ message: error.message })
+        responderError(res, error)
+    }
+}
+
+export async function replaceCliente(req, res) {
+    try {
+        const cliente = await clienteService.replaceCliente(req.params.id, req.body)
+        res.status(200).json(cliente)
+    } catch (error) {
+        responderError(res, error)
+    }
+}
+
+export async function updateCliente(req, res) {
+    try {
+        const cliente = await clienteService.updateCliente(req.params.id, req.body)
+        res.status(200).json(cliente)
+    } catch (error) {
+        responderError(res, error)
+    }
+}
+
+export async function deleteCliente(req, res) {
+    try {
+        const cliente = await clienteService.deleteCliente(req.params.id)
+        res.status(200).json(cliente)
+    } catch (error) {
+        responderError(res, error)
     }
 }
 
 export async function getBarriosByClienteId(req, res) {
     try {
-        const id = req.params.id
-        const barrios = await clienteService.getBarriosByClienteId(id)
+        const barrios = await clienteService.getBarriosByClienteId(req.params.id)
         res.status(200).json(barrios)
     } catch (error) {
-        res.status(500).json({ message: error.message })
+        responderError(res, error)
+    }
+}
+
+export async function asociarBarrio(req, res) {
+    try {
+        const barrio = await clienteService.asociarBarrio(req.params.id, req.params.barrioId)
+        res.status(200).json(barrio)
+    } catch (error) {
+        responderError(res, error)
+    }
+}
+
+export async function desasociarBarrio(req, res) {
+    try {
+        const barrio = await clienteService.desasociarBarrio(req.params.id, req.params.barrioId)
+        res.status(200).json(barrio)
+    } catch (error) {
+        responderError(res, error)
     }
 }

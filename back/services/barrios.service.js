@@ -1,9 +1,11 @@
 import { ObjectId } from "mongodb"
 import { db } from "./db.js"
+import { noEncontrado } from "./errors.js"
 
-function escapeRegex(text) {
-    return String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-}
+const barrios = db.collection("barrios")
+const clientes = db.collection("clientes")
+
+const ACTIVO = { eliminado: { $ne: true } }
 
 const ORDEN_MAP = {
     antiguedad: "antiguedad_anio",
@@ -11,106 +13,103 @@ const ORDEN_MAP = {
     superficie: "superficie_km2"
 }
 
+function escapeRegex(text) {
+    return String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+}
+
+// filtros ya validados por filtrosBarrioSchema: { q, comuna, linea, orden, eliminado }
 export async function getBarrios(filtros = {}) {
-    const filter = { eliminado: { $ne: true } }
+    const filter = filtros.eliminado === "true" ? { eliminado: true } : { ...ACTIVO }
 
-    if (filtros?.comuna) filter.comuna = { $eq: parseInt(filtros.comuna) }
-    if (filtros?.q) filter.nombre = { $regex: escapeRegex(filtros.q), $options: "i" }
-    else if (filtros?.nombre) filter.nombre = { $regex: escapeRegex(filtros.nombre), $options: "i" }
-
-    if (filtros?.linea) {
+    if (filtros.comuna) filter.comuna = filtros.comuna
+    if (filtros.q) filter.nombre = { $regex: escapeRegex(filtros.q), $options: "i" }
+    if (filtros.linea) {
         filter.$or = [
-            { "transporte_publico.colectivos_principales": filtros.linea },
-            { "transporte_publico.trenes": filtros.linea }
+            { "transporte_publico.subtes": filtros.linea },
+            { "transporte_publico.trenes": filtros.linea },
+            { "transporte_publico.colectivos_principales": filtros.linea }
         ]
     }
 
-    let sort
-    const campoOrden = ORDEN_MAP[filtros?.orden]
-    if (campoOrden) sort = { [campoOrden]: -1 }
+    const campoOrden = ORDEN_MAP[filtros.orden]
+    const sort = campoOrden ? { [campoOrden]: -1 } : { nombre: 1 }
 
-    let query = db.collection("barrios").find(filter)
-    if (sort) query = query.sort(sort)
-    const barrios = await query.toArray()
-    return barrios
+    return barrios.find(filter).sort(sort).toArray()
 }
 
+// Valores distintos de cada tipo de transporte, para armar los filtros del front.
 export async function getLineasTransporte() {
-    const colectivos = await db.collection("barrios").aggregate([
-        { $match: { eliminado: { $ne: true }, "transporte_publico.colectivos_principales": { $exists: true } } },
-        { $unwind: "$transporte_publico.colectivos_principales" },
-        { $group: { _id: "$transporte_publico.colectivos_principales" } },
-        { $sort: { _id: 1 } }
-    ]).toArray()
-
-    const trenes = await db.collection("barrios").aggregate([
-        { $match: { eliminado: { $ne: true }, "transporte_publico.trenes": { $exists: true } } },
-        { $unwind: "$transporte_publico.trenes" },
-        { $group: { _id: "$transporte_publico.trenes" } },
-        { $sort: { _id: 1 } }
-    ]).toArray()
-
+    const [subtes, trenes, colectivos] = await Promise.all([
+        barrios.distinct("transporte_publico.subtes", ACTIVO),
+        barrios.distinct("transporte_publico.trenes", ACTIVO),
+        barrios.distinct("transporte_publico.colectivos_principales", ACTIVO)
+    ])
+    const porNumero = (a, b) => a.localeCompare(b, "es", { numeric: true })
     return {
-        colectivos: colectivos.map(c => c._id),
-        trenes: trenes.map(t => t._id)
+        subtes: subtes.sort(porNumero),
+        trenes: trenes.sort(porNumero),
+        colectivos: colectivos.sort(porNumero)
     }
 }
 
-export async function getBarriosDesactivados() {
-    const barrios = await db.collection("barrios").find({ eliminado: true }).toArray()
-    return barrios
-}
-
-export async function getBarriosByComuna(comuna) {
-    const barrios = await db.collection("barrios").find({
-        comuna: parseInt(comuna),
-        eliminado: { $ne: true }
-    }).toArray()
-    return barrios
-}
-
+// Devuelve el barrio con los datos básicos de su cliente asociado (si tiene).
 export async function getBarrioById(id) {
-    const barrio = await db.collection("barrios").findOne({ _id: new ObjectId(id) })
+    const barrio = await barrios.findOne({ _id: new ObjectId(id) })
+    if (!barrio) throw noEncontrado("Barrio")
+    if (barrio.clienteId) {
+        barrio.cliente = await clientes.findOne({ _id: barrio.clienteId }, { projection: { nombre: 1, foto: 1 } })
+    }
     return barrio
 }
 
-export async function saveBarrio(barrio) {
-    const result = await db.collection("barrios").insertOne(barrio)
-    return { ...barrio, _id: result.insertedId }
+export async function saveBarrio(datos) {
+    const result = await barrios.insertOne(datos)
+    return { ...datos, _id: result.insertedId }
 }
 
-export async function editBarrio(id, updates) {
-    const existing = await getBarrioById(id)
-    if (!existing) return null
-    const merged = { ...existing, ...updates, _id: existing._id }
-    await db.collection("barrios").replaceOne({ _id: existing._id }, merged)
-    return merged
+// PUT: reemplaza los datos del barrio. Se conservan el estado (eliminado)
+// y la asociación con el cliente, que no forman parte del formulario.
+export async function replaceBarrio(id, datos) {
+    const _id = new ObjectId(id)
+    const existente = await barrios.findOne({ _id })
+    if (!existente) throw noEncontrado("Barrio")
+
+    const reemplazo = { ...datos }
+    if (existente.eliminado !== undefined) reemplazo.eliminado = existente.eliminado
+    if (existente.clienteId) reemplazo.clienteId = existente.clienteId
+
+    await barrios.replaceOne({ _id }, reemplazo)
+    return { _id, ...reemplazo }
 }
 
-export async function updateBarrio(id, barrio) {
-    await db.collection("barrios").updateOne(
-        { _id: new ObjectId(id) }, { $set: barrio }
+// PATCH: solo los campos enviados. El transporte se actualiza por clave
+// ("transporte_publico.subtes") para no pisar las otras listas.
+export async function updateBarrio(id, datos) {
+    const { transporte_publico, ...resto } = datos
+    const cambios = { ...resto }
+    for (const [clave, valor] of Object.entries(transporte_publico ?? {})) {
+        cambios[`transporte_publico.${clave}`] = valor
+    }
+
+    const barrio = await barrios.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: cambios },
+        { returnDocument: "after" }
     )
+    if (!barrio) throw noEncontrado("Barrio")
     return barrio
 }
 
-export async function desactivarBarrio(id) {
-    const barrio = await getBarrioById(id)
-    await db.collection("barrios").updateOne(
-        { _id: new ObjectId(id) }, { $set: { eliminado: true } }
+async function setEliminado(id, eliminado) {
+    const barrio = await barrios.findOneAndUpdate(
+        { _id: new ObjectId(id) },
+        { $set: { eliminado } },
+        { returnDocument: "after" }
     )
+    if (!barrio) throw noEncontrado("Barrio")
     return barrio
 }
 
-export async function activarBarrio(id) {
-    const barrio = await getBarrioById(id)
-    await db.collection("barrios").updateOne(
-        { _id: new ObjectId(id) }, { $set: { eliminado: false } }
-    )
-    return barrio
-}
-
-export async function deleteBarrioFisico(id) {
-    const result = await db.collection("barrios").deleteOne({ _id: new ObjectId(id) })
-    return result.deletedCount
-}
+// Baja lógica: el barrio deja de listarse pero se puede reactivar.
+export const desactivarBarrio = (id) => setEliminado(id, true)
+export const activarBarrio = (id) => setEliminado(id, false)

@@ -20,4 +20,13 @@ app.use((req, res) => {
     res.status(404).json({ message: "Recurso no encontrado" })
 })
 
+// Errores no capturados (por ejemplo, un body con JSON mal formado) también en JSON.
+app.use((error, req, res, next) => {
+    if (error.type === "entity.parse.failed") {
+        return res.status(400).json({ message: "El cuerpo de la petición no es un JSON válido" })
+    }
+    console.error(error)
+    res.status(500).json({ message: "Error interno del servidor" })
+})
+
 app.listen(PORT, () => console.log(`API Barriopoli en http://localhost:${PORT}/api`))

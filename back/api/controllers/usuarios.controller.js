@@ -1,11 +1,5 @@
 import * as usuarioService from "../../services/usuarios.service.js"
-
-function responderError(res, error) {
-    if (error instanceof usuarioService.AuthError) {
-        return res.status(error.status).json({ message: error.message })
-    }
-    res.status(500).json({ message: "Error interno del servidor" })
-}
+import { responderError } from "./responder.js"
 
 export async function registro(req, res) {
     try {
