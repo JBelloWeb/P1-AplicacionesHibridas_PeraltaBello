@@ -1,3 +1,33 @@
+import { useNavigate, useParams } from "react-router"
+import { toast } from "react-toastify"
+import { useApiBarrios } from "../../services/barrios.service.js"
+import { useFetch } from "../../hooks/useFetch.js"
+import Estado from "../../components/Estado.jsx"
+import BarrioForm, { barrioAFormValues } from "./BarrioForm.jsx"
+
 export default function EditarBarrio() {
-    return <p className="text-center py-12 text-violeta-oscuro">Editar barrio — próximamente (Parte 6)</p>
+    const { id } = useParams()
+    const api = useApiBarrios()
+    const navigate = useNavigate()
+
+    const { data: barrio, estado, error } = useFetch(() => api.getBarrio(id), [id])
+
+    async function onSubmit(datos) {
+        await api.reemplazarBarrio(id, datos)
+        toast.success("Barrio actualizado.")
+        navigate(`/barrios/${id}`)
+    }
+
+    return (
+        <Estado estado={estado} error={error}>
+            {barrio && (
+                <BarrioForm
+                    titulo={`Editar: ${barrio.nombre}`}
+                    valoresIniciales={barrioAFormValues(barrio)}
+                    onSubmit={onSubmit}
+                    cancelar={`/barrios/${id}`}
+                />
+            )}
+        </Estado>
+    )
 }

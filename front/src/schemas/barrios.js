@@ -3,6 +3,16 @@ import { listaDeTextos, urlOpcional } from "./comunes.js"
 
 const ANIO_ACTUAL = new Date().getFullYear()
 
+// "" en un input numérico → undefined (campo no enviado), no 0.
+const numOpcional = (schema) =>
+    z.preprocess((v) => (v === "" || v === undefined ? undefined : v), schema.optional())
+
+// "" en un input de lista → omitido (no se manda array vacío al back).
+const listaOpcional = z.preprocess(
+    (v) => (v === "" || v === undefined ? undefined : v),
+    listaDeTextos.optional()
+)
+
 export const barrioSchema = z.object({
     nombre: z
         .string("El nombre es obligatorio")
@@ -15,27 +25,21 @@ export const barrioSchema = z.object({
         .min(1, "La comuna va de 1 a 15")
         .max(15, "La comuna va de 1 a 15"),
     img: urlOpcional("La imagen debe ser una URL válida"),
-    cantidad_habitantes: z.coerce
-        .number("Los habitantes deben ser un número")
-        .int("Los habitantes deben ser un número entero")
-        .nonnegative("Los habitantes no pueden ser negativos")
-        .optional(),
-    superficie_km2: z.coerce
-        .number("La superficie debe ser un número")
-        .positive("La superficie debe ser mayor a 0")
-        .optional(),
-    antiguedad_anio: z.coerce
-        .number("El año debe ser un número")
-        .int("El año debe ser un número entero")
-        .min(1536, "El año no puede ser anterior a la fundación de Buenos Aires (1536)")
-        .max(ANIO_ACTUAL, `El año no puede ser posterior a ${ANIO_ACTUAL}`)
-        .optional(),
-    edificios_emblematicos: listaDeTextos.optional(),
+    cantidad_habitantes: numOpcional(z.coerce.number("Los habitantes deben ser un número").int().nonnegative("Los habitantes no pueden ser negativos")),
+    superficie_km2: numOpcional(z.coerce.number("La superficie debe ser un número").positive("La superficie debe ser mayor a 0")),
+    antiguedad_anio: numOpcional(
+        z.coerce
+            .number("El año debe ser un número")
+            .int()
+            .min(1536, "El año no puede ser anterior a la fundación de Buenos Aires (1536)")
+            .max(ANIO_ACTUAL, `El año no puede ser posterior a ${ANIO_ACTUAL}`)
+    ),
+    edificios_emblematicos: listaOpcional,
     transporte_publico: z
         .object({
-            subtes: listaDeTextos.optional(),
-            trenes: listaDeTextos.optional(),
-            colectivos_principales: listaDeTextos.optional()
+            subtes: listaOpcional,
+            trenes: listaOpcional,
+            colectivos_principales: listaOpcional
         })
         .optional()
 })
