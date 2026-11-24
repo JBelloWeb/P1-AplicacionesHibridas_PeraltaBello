@@ -1,9 +1,5 @@
-import { MongoClient, ObjectId } from "mongodb"
-
-const MONGO_URI = "mongodb+srv://juaniperalta_db_user:cIp6LGS9s1rRyrSt@cluster0.6jddqoh.mongodb.net/?appName=Cluster0"
-
-const client = new MongoClient(MONGO_URI)
-const db = client.db("barriopoli")
+import { ObjectId } from "mongodb"
+import { db } from "./db.js"
 
 function escapeRegex(text) {
     return String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
@@ -69,13 +65,6 @@ export async function getBarriosByComuna(comuna) {
     const barrios = await db.collection("barrios").find({
         comuna: parseInt(comuna),
         eliminado: { $ne: true }
-    }).toArray()
-    return barrios
-}
-
-export async function getBarriosByClienteId(clienteId) {
-    const barrios = await db.collection("barrios").find({
-        clienteId: new ObjectId(clienteId)
     }).toArray()
     return barrios
 }

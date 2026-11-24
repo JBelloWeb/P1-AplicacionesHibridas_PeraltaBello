@@ -1,18 +1,21 @@
+import "dotenv/config"
 import express from "express"
-import barriosRoutes from "./routes/barrios.routes.js"
-import clientesRoutes from "./routes/clientes.routes.js"
+import cors from "cors"
 import barriosApiRoutes from "./api/routes/barrios.routes.js"
 import clientesApiRoutes from "./api/routes/clientes.routes.js"
 
 const app = express()
+const PORT = process.env.PORT ?? 3333
 
-app.use("/", express.static("public"))
-app.use(express.urlencoded({ extended: true }))
+app.use(cors())
 app.use(express.json())
 
-app.use(barriosRoutes)
-app.use(clientesRoutes)
 app.use(barriosApiRoutes)
 app.use(clientesApiRoutes)
 
-app.listen(3333, () => console.log("Funcionando...."))
+// Cualquier ruta no definida responde JSON (la API no sirve HTML).
+app.use((req, res) => {
+    res.status(404).json({ message: "Recurso no encontrado" })
+})
+
+app.listen(PORT, () => console.log(`API Barriopoli en http://localhost:${PORT}/api`))

@@ -1,9 +1,5 @@
-import { MongoClient, ObjectId } from "mongodb"
-
-const MONGO_URI = "mongodb+srv://juaniperalta_db_user:cIp6LGS9s1rRyrSt@cluster0.6jddqoh.mongodb.net/?appName=Cluster0"
-
-const client = new MongoClient(MONGO_URI)
-const db = client.db("barriopoli")
+import { ObjectId } from "mongodb"
+import { db } from "./db.js"
 
 export async function getClientes() {
     const clientes = await db.collection("clientes").find().toArray()
