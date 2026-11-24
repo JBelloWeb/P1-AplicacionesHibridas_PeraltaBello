@@ -1,0 +1,21 @@
+@import url('https://fonts.googleapis.com/css2?family=Rosario:wght@400;600;700&display=swap');
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Rosario', ui-sans-serif, system-ui, sans-serif;
+  --color-violeta: #8e66cc;
+  --color-violeta-oscuro: #5f3f96;
+  --color-lila: #b37dff;
+  --color-durazno: #ffdeb6;
+  --color-papel: #f6f7ee;
+  --color-tinta: #080713;
+}
+
+@layer components {
+  .btn      { @apply rounded-full bg-violeta-oscuro px-5 py-2 font-semibold text-white hover:bg-violeta transition-colors; }
+  .btn-sec  { @apply rounded-full border-2 border-violeta-oscuro px-5 py-2 font-semibold text-violeta-oscuro hover:bg-lila/15 transition-colors; }
+  .btn-peligro { @apply rounded-full bg-red-600 px-5 py-2 font-semibold text-white hover:bg-red-700 transition-colors; }
+  .card     { @apply flex flex-col rounded-3xl bg-white border border-lila/40 hover:outline-2 hover:outline-offset-2 hover:outline-lila; }
+  .pastilla { @apply rounded-full bg-durazno px-3 py-0.5 text-sm font-semibold text-violeta-oscuro; }
+  .campo    { @apply w-full rounded-xl border border-lila/60 bg-white px-3 py-2 focus:outline-2 focus:outline-violeta focus:border-violeta transition-colors; }
+}
