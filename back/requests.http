@@ -1,0 +1,170 @@
+### Barriopoli API — peticiones de ejemplo
+### Se usan con la extensión REST Client de VS Code (o copiarlas a Thunder Client / Postman).
+### 1) Ejecutar "Login admin" y copiar el token en @tokenAdmin.
+
+@api = http://localhost:3333/api
+@tokenAdmin = pegar-token-admin
+@tokenUser = pegar-token-user
+@barrioId = 6ab1376d323df8efae43caf8
+@clienteId = 6ab48540fddd58e2e21b1e1e
+
+############################## AUTH ##############################
+
+### Registro (siempre crea rol "user")
+POST {{api}}/auth/registro
+Content-Type: application/json
+
+{
+    "nombre": "Vecina Prueba",
+    "email": "vecina@example.com",
+    "password": "Vecina123!",
+    "confirmPassword": "Vecina123!"
+}
+
+### Login admin (credenciales de ADMIN_EMAIL / ADMIN_PASSWORD del .env)
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "admin@barriopoli.com",
+    "password": "cambiar-por-ADMIN_PASSWORD"
+}
+
+### Login user
+POST {{api}}/auth/login
+Content-Type: application/json
+
+{
+    "email": "vecina@example.com",
+    "password": "Vecina123!"
+}
+
+### Usuarios (solo admin)
+GET {{api}}/usuarios
+Authorization: Bearer {{tokenAdmin}}
+
+############################## BARRIOS ##############################
+
+### Lista pública con filtros opcionales: q, comuna (1-15), linea, orden (antiguedad|habitantes|superficie)
+GET {{api}}/barrios?comuna=14&orden=habitantes
+
+### Barrios dados de baja (solo admin)
+GET {{api}}/barrios?eliminado=true
+Authorization: Bearer {{tokenAdmin}}
+
+### Líneas de transporte (para los filtros)
+GET {{api}}/barrios/lineas
+
+### Detalle (incluye el cliente asociado, si tiene)
+GET {{api}}/barrios/{{barrioId}}
+
+### Crear (admin). Las listas aceptan array o texto separado por comas.
+POST {{api}}/barrios
+Content-Type: application/json
+Authorization: Bearer {{tokenAdmin}}
+
+{
+    "nombre": "Barrio Nuevo",
+    "comuna": 3,
+    "img": "https://picsum.photos/400/225",
+    "cantidad_habitantes": 1000,
+    "superficie_km2": 1.5,
+    "antiguedad_anio": 1900,
+    "edificios_emblematicos": "Torre A, Torre B",
+    "transporte_publico": {
+        "subtes": ["Línea H"],
+        "colectivos_principales": "12, 24"
+    }
+}
+
+### Reemplazar (admin): nombre y comuna obligatorios
+PUT {{api}}/barrios/{{barrioId}}
+Content-Type: application/json
+Authorization: Bearer {{tokenAdmin}}
+
+{
+    "nombre": "Palermo",
+    "comuna": 14
+}
+
+### Actualizar parcialmente (admin)
+PATCH {{api}}/barrios/{{barrioId}}
+Content-Type: application/json
+Authorization: Bearer {{tokenAdmin}}
+
+{
+    "transporte_publico": { "trenes": ["Línea Mitre"] }
+}
+
+### Baja lógica (admin)
+DELETE {{api}}/barrios/{{barrioId}}
+Authorization: Bearer {{tokenAdmin}}
+
+### Reactivar (admin)
+PATCH {{api}}/barrios/{{barrioId}}/activar
+Authorization: Bearer {{tokenAdmin}}
+
+### Error de validación → 400 con { message, errores: [{ campo, mensaje }] }
+POST {{api}}/barrios
+Content-Type: application/json
+Authorization: Bearer {{tokenAdmin}}
+
+{
+    "nombre": "A",
+    "comuna": 20
+}
+
+############################## CLIENTES ##############################
+
+### Lista (con sesión), incluye cantidad_barrios
+GET {{api}}/clientes
+Authorization: Bearer {{tokenUser}}
+
+### Detalle
+GET {{api}}/clientes/{{clienteId}}
+Authorization: Bearer {{tokenUser}}
+
+### Crear (admin)
+POST {{api}}/clientes
+Content-Type: application/json
+Authorization: Bearer {{tokenAdmin}}
+
+{
+    "nombre": "Cliente Nuevo",
+    "foto": "https://picsum.photos/400/225",
+    "descripcion": "Vecino de Almagro"
+}
+
+### Reemplazar (admin)
+PUT {{api}}/clientes/{{clienteId}}
+Content-Type: application/json
+Authorization: Bearer {{tokenAdmin}}
+
+{
+    "nombre": "Cliente Renombrado"
+}
+
+### Actualizar parcialmente (admin)
+PATCH {{api}}/clientes/{{clienteId}}
+Content-Type: application/json
+Authorization: Bearer {{tokenAdmin}}
+
+{
+    "descripcion": "Nueva descripción"
+}
+
+### Borrar (admin): también libera sus barrios
+DELETE {{api}}/clientes/{{clienteId}}
+Authorization: Bearer {{tokenAdmin}}
+
+### Barrios de un cliente
+GET {{api}}/clientes/{{clienteId}}/barrios
+Authorization: Bearer {{tokenUser}}
+
+### Asociar barrio a cliente (admin)
+PUT {{api}}/clientes/{{clienteId}}/barrios/{{barrioId}}
+Authorization: Bearer {{tokenAdmin}}
+
+### Desasociar (admin)
+DELETE {{api}}/clientes/{{clienteId}}/barrios/{{barrioId}}
+Authorization: Bearer {{tokenAdmin}}
