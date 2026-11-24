@@ -3,6 +3,7 @@ import express from "express"
 import cors from "cors"
 import barriosApiRoutes from "./api/routes/barrios.routes.js"
 import clientesApiRoutes from "./api/routes/clientes.routes.js"
+import usuariosApiRoutes from "./api/routes/usuarios.routes.js"
 
 const app = express()
 const PORT = process.env.PORT ?? 3333
@@ -12,6 +13,7 @@ app.use(express.json())
 
 app.use(barriosApiRoutes)
 app.use(clientesApiRoutes)
+app.use(usuariosApiRoutes)
 
 // Cualquier ruta no definida responde JSON (la API no sirve HTML).
 app.use((req, res) => {

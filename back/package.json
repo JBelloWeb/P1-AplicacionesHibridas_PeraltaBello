@@ -1,10 +1,10 @@
 {
-  "name": "PeraltaBello_Parcial1_AH",
+  "name": "barriopoli-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "API REST de Barriopoli (Parcial 2 - Aplicaciones Híbridas)",
   "main": "main.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "crear-admin": "node scripts/crear-admin.js",
     "dev": "nodemon main.js",
     "start": "node main.js"
   },
