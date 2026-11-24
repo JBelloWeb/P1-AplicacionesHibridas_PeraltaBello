@@ -13,7 +13,14 @@ export default function ClienteCard({ cliente }) {
                 )}
             </div>
             <div className="flex flex-1 flex-col p-4 gap-3">
-                <h2 className="font-bold text-violeta-oscuro text-lg leading-tight">{cliente.nombre}</h2>
+                <div className="flex items-start justify-between gap-2">
+                    <h2 className="font-bold text-violeta-oscuro text-lg leading-tight">{cliente.nombre}</h2>
+                    {cliente.cantidad_barrios > 0 && (
+                        <span className="pastilla shrink-0 text-xs">
+                            {cliente.cantidad_barrios} barrio{cliente.cantidad_barrios !== 1 ? "s" : ""}
+                        </span>
+                    )}
+                </div>
                 {cliente.descripcion && (
                     <p className="text-sm text-tinta/70 line-clamp-2">{cliente.descripcion}</p>
                 )}
