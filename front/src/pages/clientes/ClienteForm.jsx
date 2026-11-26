@@ -39,6 +39,7 @@ export default function ClienteForm({ titulo, valoresIniciales = {}, onSubmit, c
         <div className="mx-auto max-w-xl">
             <h1 className="mb-8 text-3xl font-bold text-violeta-oscuro">{titulo}</h1>
             <form
+                noValidate
                 onSubmit={handleSubmit(handleEnvio)}
                 className="flex flex-col gap-5 rounded-3xl border border-lila/30 bg-white p-8"
             >

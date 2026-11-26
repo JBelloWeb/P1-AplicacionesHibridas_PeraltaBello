@@ -36,6 +36,7 @@ export default function Registro() {
         <div className="mx-auto max-w-md">
             <h1 className="mb-8 text-center text-3xl font-bold text-violeta-oscuro">Registrarse</h1>
             <form
+                noValidate
                 onSubmit={handleSubmit(onSubmit)}
                 className="flex flex-col gap-5 rounded-3xl border border-lila/30 bg-white p-8"
             >
