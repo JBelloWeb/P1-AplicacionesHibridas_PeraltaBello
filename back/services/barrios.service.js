@@ -17,7 +17,6 @@ function escapeRegex(text) {
     return String(text).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 }
 
-// filtros ya validados por filtrosBarrioSchema: { q, comuna, linea, orden, eliminado }
 export async function getBarrios(filtros = {}) {
     const filter = filtros.eliminado === "true" ? { eliminado: true } : { ...ACTIVO }
 
@@ -37,7 +36,6 @@ export async function getBarrios(filtros = {}) {
     return barrios.find(filter).sort(sort).toArray()
 }
 
-// Valores distintos de cada tipo de transporte, para armar los filtros del front.
 export async function getLineasTransporte() {
     const [subtes, trenes, colectivos] = await Promise.all([
         barrios.distinct("transporte_publico.subtes", ACTIVO),
@@ -52,7 +50,6 @@ export async function getLineasTransporte() {
     }
 }
 
-// Devuelve el barrio con los datos básicos de su cliente asociado (si tiene).
 export async function getBarrioById(id) {
     const barrio = await barrios.findOne({ _id: new ObjectId(id) })
     if (!barrio) throw noEncontrado("Barrio")
@@ -67,8 +64,6 @@ export async function saveBarrio(datos) {
     return { ...datos, _id: result.insertedId }
 }
 
-// PUT: reemplaza los datos del barrio. Se conservan el estado (eliminado)
-// y la asociación con el cliente, que no forman parte del formulario.
 export async function replaceBarrio(id, datos) {
     const _id = new ObjectId(id)
     const existente = await barrios.findOne({ _id })
@@ -82,8 +77,6 @@ export async function replaceBarrio(id, datos) {
     return { _id, ...reemplazo }
 }
 
-// PATCH: solo los campos enviados. El transporte se actualiza por clave
-// ("transporte_publico.subtes") para no pisar las otras listas.
 export async function updateBarrio(id, datos) {
     const { transporte_publico, ...resto } = datos
     const cambios = { ...resto }
@@ -110,6 +103,5 @@ async function setEliminado(id, eliminado) {
     return barrio
 }
 
-// Baja lógica: el barrio deja de listarse pero se puede reactivar.
 export const desactivarBarrio = (id) => setEliminado(id, true)
 export const activarBarrio = (id) => setEliminado(id, false)

@@ -19,7 +19,6 @@ router.put("/api/clientes/:id", soloAdmin, idCliente, validate(clienteSchema), c
 router.patch("/api/clientes/:id", soloAdmin, idCliente, validate(clienteParcialSchema), clienteController.updateCliente)
 router.delete("/api/clientes/:id", soloAdmin, idCliente, clienteController.deleteCliente)
 
-// Barrios de un cliente (sub-recurso)
 router.get("/api/clientes/:id/barrios", conSesion, idCliente, clienteController.getBarriosByClienteId)
 router.put("/api/clientes/:id/barrios/:barrioId", soloAdmin, idClienteYBarrio, clienteController.asociarBarrio)
 router.delete("/api/clientes/:id/barrios/:barrioId", soloAdmin, idClienteYBarrio, clienteController.desasociarBarrio)

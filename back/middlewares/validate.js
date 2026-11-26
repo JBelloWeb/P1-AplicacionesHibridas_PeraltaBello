@@ -1,5 +1,3 @@
-// Quita las claves con valor undefined (campos opcionales no enviados):
-// el driver de Mongo las guardaría como null.
 function sinIndefinidos(valor) {
     if (Array.isArray(valor)) return valor.map(sinIndefinidos)
     if (valor && typeof valor === "object") {
@@ -19,8 +17,6 @@ function formatearErrores(error) {
     }))
 }
 
-// Valida req.body con un schema de Zod. Si pasa, req.body queda con los datos
-// ya limpios (trim, transformaciones, campos desconocidos descartados).
 export function validate(schema) {
     return async (req, res, next) => {
         const resultado = await schema.safeParseAsync(req.body ?? {})
@@ -32,8 +28,6 @@ export function validate(schema) {
     }
 }
 
-// Valida el query string. En Express 5 req.query es de solo lectura,
-// así que el resultado queda en req.filtros.
 export function validateQuery(schema) {
     return async (req, res, next) => {
         const resultado = await schema.safeParseAsync(req.query)

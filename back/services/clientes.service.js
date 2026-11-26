@@ -5,7 +5,6 @@ import { noEncontrado } from "./errors.js"
 const clientes = db.collection("clientes")
 const barrios = db.collection("barrios")
 
-// Lista con la cantidad de barrios activos asociados a cada cliente.
 export async function getClientes() {
     return clientes
         .aggregate([
@@ -53,7 +52,6 @@ export async function updateCliente(id, datos) {
     return cliente
 }
 
-// Borra el cliente y libera los barrios que tenía asociados.
 export async function deleteCliente(id) {
     const _id = new ObjectId(id)
     const cliente = await clientes.findOneAndDelete({ _id })
@@ -70,7 +68,6 @@ export async function getBarriosByClienteId(id) {
         .toArray()
 }
 
-// Un barrio tiene como máximo un cliente: asociar lo reasigna.
 export async function asociarBarrio(clienteId, barrioId) {
     await getClienteById(clienteId)
     const barrio = await barrios.findOneAndUpdate(

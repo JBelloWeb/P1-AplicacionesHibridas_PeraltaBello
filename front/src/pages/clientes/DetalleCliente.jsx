@@ -13,20 +13,15 @@ export default function DetalleCliente() {
     const apiClientes = useApiClientes()
     const apiBarrios = useApiBarrios()
 
-    // Cliente (no cambia con las asociaciones)
     const { data: cliente, estado, error } = useFetch(() => apiClientes.getCliente(id), [id])
 
-    // Barrios del cliente — estado local para mutaciones sin refetch
     const [barriosAsociados, setBarriosAsociados] = useState(null)
     const [cargandoBarrios, setCargandoBarrios] = useState(true)
 
-    // Todos los barrios activos — para el select de "Asociar" (admin)
     const [todosBarrios, setTodosBarrios] = useState([])
 
-    // Barrio seleccionado en el select
     const [seleccionado, setSeleccionado] = useState("")
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => {
         setCargandoBarrios(true)
         apiClientes
@@ -42,7 +37,6 @@ export default function DetalleCliente() {
         }
     }, [id])
 
-    // Barrios disponibles para asociar: activos y sin cliente asignado
     const disponibles = todosBarrios.filter((b) => !b.clienteId)
 
     async function asociar() {
@@ -77,7 +71,6 @@ export default function DetalleCliente() {
         <Estado estado={estado} error={error}>
             {cliente && (
                 <div className="mx-auto flex max-w-3xl flex-col gap-6">
-                    {/* Cabecera */}
                     <div className="overflow-hidden rounded-3xl border border-lila/30 bg-white">
                         {cliente.foto && (
                             <div className="h-48">
@@ -110,7 +103,6 @@ export default function DetalleCliente() {
                         </div>
                     </div>
 
-                    {/* Barrios asociados */}
                     <div className="rounded-2xl border border-lila/30 bg-white p-5">
                         <h2 className="mb-4 font-semibold text-violeta-oscuro">Barrios asociados</h2>
 
@@ -149,7 +141,6 @@ export default function DetalleCliente() {
                             </ul>
                         )}
 
-                        {/* Select para asociar (solo admin) */}
                         {esAdmin && disponibles.length > 0 && (
                             <div className="mt-5 flex gap-2 border-t border-lila/20 pt-4">
                                 <select

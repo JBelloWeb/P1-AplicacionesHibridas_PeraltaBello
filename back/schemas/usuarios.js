@@ -1,6 +1,5 @@
 import { z } from "zod"
 
-// Primero se normaliza (trim + minúsculas) y después se valida el formato.
 const email = z
     .string("El email es obligatorio")
     .trim()

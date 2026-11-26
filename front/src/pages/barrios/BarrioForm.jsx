@@ -5,7 +5,6 @@ import { toast } from "react-toastify"
 import { barrioSchema } from "../../schemas/barrios.js"
 import Campo from "../../components/Campo.jsx"
 
-// Convierte un barrio de la API (arrays) a valores usables por los inputs (strings).
 export function barrioAFormValues(barrio = {}) {
     const toStr = (arr) => (arr ?? []).join(", ")
     return {

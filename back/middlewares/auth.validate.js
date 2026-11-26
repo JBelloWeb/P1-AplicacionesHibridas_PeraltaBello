@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken"
 
-// Exige un header "Authorization: Bearer <token>" válido y deja el payload en req.usuario.
 export function validateToken(req, res, next) {
     const [tipo, token] = (req.headers.authorization ?? "").split(" ")
     if (tipo !== "Bearer" || !token) {
@@ -14,7 +13,6 @@ export function validateToken(req, res, next) {
     }
 }
 
-// Usar siempre después de validateToken.
 export function validateRol(roles) {
     return (req, res, next) => {
         if (roles.includes(req.usuario?.rol)) return next()

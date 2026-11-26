@@ -40,7 +40,6 @@ export const barrioSchema = z.object({
         .optional()
 })
 
-// PATCH: los mismos campos, todos opcionales, pero al menos uno.
 export const barrioParcialSchema = barrioSchema
     .partial()
     .refine((datos) => Object.values(datos).some((v) => v !== undefined), {

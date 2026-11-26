@@ -17,7 +17,6 @@ export function useFetch(fn, deps = []) {
                 setError(err.message)
                 setEstado("error")
             })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, deps)
 
     useEffect(() => {

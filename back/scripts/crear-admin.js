@@ -1,5 +1,3 @@
-// Crea (o promueve) el usuario administrador definido en el .env.
-// Uso: pnpm crear-admin
 import "dotenv/config"
 import { registroSchema } from "../schemas/usuarios.js"
 import * as usuarioService from "../services/usuarios.service.js"

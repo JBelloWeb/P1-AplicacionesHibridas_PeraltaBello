@@ -6,7 +6,6 @@ import { HttpError } from "./errors.js"
 const usuarios = db.collection("usuarios")
 const SIN_PASSWORD = { projection: { password: 0 } }
 
-// Garantiza emails únicos también a nivel base de datos.
 usuarios.createIndex({ email: 1 }, { unique: true }).catch((error) =>
     console.error("No se pudo crear el índice de usuarios:", error.message)
 )
@@ -15,7 +14,6 @@ function sinPassword({ password, ...usuario }) {
     return usuario
 }
 
-// El rol nunca viene del cliente: todo registro público es "user".
 export async function registrar({ nombre, email, password }, rol = "user") {
     const existe = await usuarios.findOne({ email })
     if (existe) throw new HttpError(409, "Ya existe una cuenta con ese email")

@@ -3,11 +3,9 @@ import { listaDeTextos, urlOpcional } from "./comunes.js"
 
 const ANIO_ACTUAL = new Date().getFullYear()
 
-// "" en un input numérico → undefined (campo no enviado), no 0.
 const numOpcional = (schema) =>
     z.preprocess((v) => (v === "" || v === undefined ? undefined : v), schema.optional())
 
-// "" en un input de lista → omitido (no se manda array vacío al back).
 const listaOpcional = z.preprocess(
     (v) => (v === "" || v === undefined ? undefined : v),
     listaDeTextos.optional()

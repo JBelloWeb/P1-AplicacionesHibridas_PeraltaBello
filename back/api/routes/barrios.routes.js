@@ -9,7 +9,6 @@ const router = Router()
 
 const soloAdmin = [validateToken, validateRol(["admin"])]
 
-// La lectura es pública, salvo ver los barrios dados de baja (?eliminado=true).
 function adminSiPideEliminados(req, res, next) {
     if (req.filtros.eliminado !== "true") return next()
     validateToken(req, res, () => validateRol(["admin"])(req, res, next))
