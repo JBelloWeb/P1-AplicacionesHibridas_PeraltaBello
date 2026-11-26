@@ -10,7 +10,10 @@ export async function call(uri, method = "GET", body) {
 
     const res = await fetch(`${BASE}${uri}`, opciones)
 
-    if (res.status === 401) {
+    // 401 con token en una ruta protegida = sesión vencida o inválida.
+    // En /auth/* (login con credenciales incorrectas) el error sigue el camino
+    // normal para que el form muestre el mensaje del back.
+    if (res.status === 401 && token && !uri.startsWith("/auth/")) {
         sessionStorage.removeItem("token")
         sessionStorage.removeItem("usuario")
         window.location.href = "/login"
