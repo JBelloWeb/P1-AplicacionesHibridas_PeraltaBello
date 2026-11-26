@@ -3,7 +3,7 @@ import { toast } from "react-toastify"
 import { useApiBarrios } from "../../services/barrios.service.js"
 import { useFetch } from "../../hooks/useFetch.js"
 import Estado from "../../components/Estado.jsx"
-import BarrioForm, { barrioAFormValues } from "./BarrioForm.jsx"
+import BarrioForm from "./BarrioForm.jsx"
 
 export default function EditarBarrio() {
     const { id } = useParams()
@@ -23,7 +23,7 @@ export default function EditarBarrio() {
             {barrio && (
                 <BarrioForm
                     titulo={`Editar: ${barrio.nombre}`}
-                    valoresIniciales={barrioAFormValues(barrio)}
+                    valoresIniciales={barrio}
                     onSubmit={onSubmit}
                     cancelar={`/barrios/${id}`}
                 />

@@ -3,7 +3,7 @@ import { toast } from "react-toastify"
 import { useApiClientes } from "../../services/clientes.service.js"
 import { useFetch } from "../../hooks/useFetch.js"
 import Estado from "../../components/Estado.jsx"
-import ClienteForm, { clienteAFormValues } from "./ClienteForm.jsx"
+import ClienteForm from "./ClienteForm.jsx"
 
 export default function EditarCliente() {
     const { id } = useParams()
@@ -23,7 +23,7 @@ export default function EditarCliente() {
             {cliente && (
                 <ClienteForm
                     titulo={`Editar: ${cliente.nombre}`}
-                    valoresIniciales={clienteAFormValues(cliente)}
+                    valoresIniciales={cliente}
                     onSubmit={onSubmit}
                     cancelar={`/clientes/${id}`}
                 />
